@@ -24,6 +24,55 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
     // SEE THE PROVIDED SOLUTION EXECUTABLE TO SEE THEIR EXPECTED BEHAVIOR
 
     // YOUR CODE HERE
+
+    char* mid;
+    char hasSlash = 0;
+    char* token=pathName;
+
+    //find end
+    for(; *token != '\0'; token++){
+            //find start of dirname
+        if(* token == '/'){
+            hasSlash = 1;
+        }
+    }
+
+    // printf("hasSlash: %d\n",hasSlash);
+
+    //if no slash
+    if(hasSlash == 0){
+        //copy to base
+        strcpy(dirName,"");
+
+        //copy to dirname
+        strcpy(baseName,pathName);
+    }else{
+
+        //go back to a / or start of path.
+        while( *token != '/' ){
+            token--;
+        }
+
+        mid = token;
+        *mid = '\0';
+        mid++;
+
+        //copy to base
+        strcpy(baseName,mid);
+
+        //copy to dirname
+        strcpy(dirName,pathName);
+
+    }
+
+    // printf("base: %s\n",baseName);
+    // printf("dir: %s\n",dirName);
+    
+
+    struct NODE temp = {
+        baseName,
+    }
+
     //
     return NULL;
 }
