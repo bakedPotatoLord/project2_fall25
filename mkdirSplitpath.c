@@ -81,7 +81,7 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
         }
     }
 
-    printf("hasSlash: %d\n",hasSlash);
+    // printf("hasSlash: %d\n",hasSlash);
 
     //if no slash
     if(hasSlash == 0){
@@ -109,7 +109,7 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
 
     }
 
-    printf("split <%s> to base <%s> and DIR <%s>\n",pathName,baseName,dirName);
+    // printf("split <%s> to base <%s> and DIR <%s>\n",pathName,baseName,dirName);
     // printf("base: %s\n",baseName);
     // printf("dir: %s\n",dirName);
 
@@ -129,7 +129,7 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
             if(traversalPtr == NULL){
                 return NULL;
             }
-            printf(" %s\n", dir);
+            // printf(" %s\n", dir);
             dir = strtok(NULL, splitter); // Subsequent calls use NULL
         }
     }
