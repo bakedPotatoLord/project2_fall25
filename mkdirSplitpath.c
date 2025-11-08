@@ -3,31 +3,6 @@
 extern struct NODE* root;
 extern struct NODE* cwd;
 
-//make directory
-void mkdir(char pathName[]){
-
-    char baseName[64];
-    char dirName[64];
-
-    struct NODE* base = splitPath(pathName,baseName,dirName);
-
-    struct NODE* firstChild = base->childPtr;
-
-    struct NODE* newNode = (struct NODE*)malloc(sizeof(struct NODE));
-
-    strcpy(newNode->name,baseName);
-    newNode->fileType = 'D';
-    newNode->childPtr = NULL;
-    newNode->siblingPtr = firstChild;
-    newNode->parentPtr = base;
-
-    base->childPtr = newNode;
-
-
-
-    return;
-}
-
 
 struct NODE* getChild(struct NODE* directory, char* name){
 
@@ -47,12 +22,51 @@ struct NODE* getChild(struct NODE* directory, char* name){
         }
         iterator = iterator->siblingPtr;
     }
-    if(child == NULL){
-        printf("ERROR: directory %s does not exist\n", name);
-        return NULL;
-    }
+    
     return child;
 }
+
+//make directory
+void mkdir(char pathName[]){
+
+    char baseName[64];
+    char dirName[64];
+
+    char pathNameCopy[64];
+    strcpy(pathNameCopy,pathName);
+
+    struct NODE* base = splitPath(pathName,baseName,dirName);
+    struct NODE* firstChild = base->childPtr;
+
+    //check for no name
+    if(baseName[0] == '\0'){
+        printf("MKDIR ERROR: no path provided\n");
+        return;
+    }
+
+    //check for duplicate node
+    if(getChild(base,baseName) != NULL){
+        printf("MKDIR ERROR: directory %s already exists\n", baseName);
+        return;
+    }
+
+    struct NODE* newNode = (struct NODE*)malloc(sizeof(struct NODE));
+
+    strcpy(newNode->name,baseName);
+    newNode->fileType = 'D';
+    newNode->childPtr = NULL;
+    newNode->siblingPtr = firstChild;
+    newNode->parentPtr = base;
+
+    base->childPtr = newNode;
+
+    printf("MKDIR SUCCESS: node %s created\n", pathNameCopy);
+
+    return;
+}
+
+
+
 
 //handles tokenizing and absolute/relative pathing options
 struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
@@ -65,53 +79,65 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
     // YOUR CODE HERE
 
     char* mid;
-    char hasSlash = 0;
+    char slashCount = 0;
+    char firstSlash = 0;
     char* token=pathName;
 
-    if(pathName[0] == '/'){
-        token++;
-        pathName++;
-    }
+    char pathNameCopy[64];
+    strcpy(pathNameCopy,pathName);
 
     //find end
     for(; *token != '\0'; token++){
             //find start of dirname
         if(* token == '/'){
-            hasSlash = 1;
+            slashCount++;
+            if(token ==pathName){
+                //if on first char
+                firstSlash = 1;
+            }
         }
     }
 
-    // printf("hasSlash: %d\n",hasSlash);
+    // printf("first slash: <%hhu>, slash count: <%hhu>\n",firstSlash,slashCount);
 
     //if no slash
-    if(hasSlash == 0){
-        //copy to base
+    if(slashCount == 0){
+        //copy empty string to base
         strcpy(dirName,"");
 
         //copy to dirname
         strcpy(baseName,pathName);
+        return root;
     }else{
 
-        //go back to a / or start of path.
-        while( *token != '/' ){
-            token--;
+        if(firstSlash && slashCount == 1){ //ex: "/a"
+            //copy to dirname and basename
+            strcpy(dirName,"");
+            strcpy(baseName,pathName+1);
+            return root;
         }
+        else{
+            //ex: /a/b/c or a/b 
 
-        mid = token;
-        *mid = '\0';
-        mid++;
+            //token starts at end. iterate back until on a slash
+            for(; *token != '/'; token--){}
 
-        //copy to base
-        strcpy(baseName,mid);
+            //turn slash to null
+            mid = token;
+            *mid = '\0';
+            mid++;
 
-        //copy to dirname
-        strcpy(dirName,pathName);
+            //copy to base
+            strcpy(baseName,mid);
 
+            //copy to dirname
+            strcpy(dirName,pathName);
+        }
     }
 
-    // printf("split <%s> to base <%s> and DIR <%s>\n",pathName,baseName,dirName);
-    // printf("base: %s\n",baseName);
-    // printf("dir: %s\n",dirName);
+    // printf("split <%s> to base <%s> and DIR <%s>\n",pathNameCopy,baseName,dirName);
+    // printf("base: %lu\n",(size_t)baseName);
+    // printf("dir: %lu\n",(size_t)dirName);
 
     char dirnameCopy[128];
     strcpy(dirnameCopy,dirName);
@@ -120,19 +146,26 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
 
     char* splitter = "/";
 
-    if(hasSlash){
+    
 
-        char* dir = strtok(dirnameCopy, splitter);
-
-        while (dir != NULL) {
-            traversalPtr = getChild(traversalPtr, dir);
-            if(traversalPtr == NULL){
-                return NULL;
-            }
-            // printf(" %s\n", dir);
-            dir = strtok(NULL, splitter); // Subsequent calls use NULL
-        }
+    if(dirnameCopy[0] == '/'){
+        printf("dirnameCopy: %s\n",dirnameCopy);
     }
+
+    char* dir = strtok(dirnameCopy, splitter);
+
+    while (dir != NULL) {
+        traversalPtr = getChild(traversalPtr, dir);
+        if(traversalPtr == NULL){
+            return NULL;
+            printf("ERROR: directory %s does not exist\n", dir);
+        
+        
+        }
+        // printf(" %s\n", dir);
+        dir = strtok(NULL, splitter); // Subsequent calls use NULL
+    }
+    
     
 
     
