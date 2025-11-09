@@ -3,16 +3,12 @@
 extern struct NODE* root;
 extern struct NODE* cwd;
 
-
 struct NODE* getChild(struct NODE* directory, char* name){
-
     struct NODE* child = NULL;
     struct NODE* iterator = directory->childPtr;
 
-    // printf("Directory name: %s, searching name: %s\n", directory->name,name);
-
+    //return NULL if directory has no children
     if(iterator == NULL){
-        // printf("getChild iterator is NULL\n");
         return NULL;
     }
 
@@ -43,7 +39,7 @@ void mkdir(char pathName[]){
     struct NODE* base = splitPath(pathName,baseName,dirName);
 
     if(base == NULL){
-        //if splitPath returns NULL
+        //if splitPath returns NULL, do nothing
         return;
     }
 
@@ -76,40 +72,24 @@ void mkdir(char pathName[]){
         while(toAttach->siblingPtr != NULL){
             toAttach = toAttach->siblingPtr;
         }
-
         toAttach->siblingPtr = newNode;
     }
-
-    
-
-
+    //log success and return
     printf("MKDIR SUCCESS: node %s successfully created\n", pathNameCopy);
-
     return;
 }
 
 
-
-
 //handles tokenizing and absolute/relative pathing options
 struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
-
-    // TO BE IMPLEMENTED
-    // NOTE THAT WITHOUT COMPLETING THIS FUNCTION CORRECTLY
-    // rm, rmdir, ls, cd, touch COMMANDS WILL NOT EXECUTE CORRECTLY
-    // SEE THE PROVIDED SOLUTION EXECUTABLE TO SEE THEIR EXPECTED BEHAVIOR
-
-    // YOUR CODE HERE
-
-
+    //make duplicate to avoid data corruption.
     char pathNameCopy[64];
     strcpy(pathNameCopy,pathName);
 
-    char* mid;
+    char* mid; //midpoint to split the path with
     char slashCount = 0;
     char firstSlash = 0;
-    char* token=pathNameCopy;
-
+    char* token=pathNameCopy; //pointer for iterating over the pathname
 
     //find end
     for(; *token != '\0'; token++){
@@ -123,18 +103,13 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
         }
     }
 
-    // printf("first slash: <%hhu>, slash count: <%hhu>\n",firstSlash,slashCount);
 
     //if no slash  ex: "f1.txt" , "a"
     if(slashCount == 0){
         //copy empty string to base
         strcpy(dirName,"");
-
         //copy to dirname
         strcpy(baseName,pathNameCopy);
-
-        // printf("split <%s> to base <%s> and DIR <%s>\n",pathName,baseName,dirName);
-
         return cwd;
     }else if(firstSlash && slashCount == 1){ //ex: "/a", "/file.txt"
         //copy to dirname and basename
@@ -154,15 +129,8 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
 
     //copy to base
     strcpy(baseName,mid);
-
     //copy to dirname
     strcpy(dirName,pathNameCopy);
-
-    // printf("split <%s> to base <%s> and DIR <%s>\n",pathName,baseName,dirName);
-    // printf("base: %lu\n",(size_t)baseName);
-    // printf("dir: %lu\n",(size_t)dirName);
-
-    
 
     char dirnameToDestroy[128];
     strcpy(dirnameToDestroy,dirName);
@@ -171,10 +139,8 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
 
     char* splitter = "/";
 
-    // printf("begin traverse\n");
-
+    //traverse tree
     char* dir = strtok(dirnameToDestroy, splitter);
-
     while (dir != NULL) {
         traversalPtr = getChild(traversalPtr, dir);
         if(traversalPtr == NULL){
@@ -185,8 +151,5 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
         dir = strtok(NULL, splitter); // Subsequent calls use NULL
     }
     
-    // printf("end traverse\n");
-    
-    //
     return traversalPtr;
 }
