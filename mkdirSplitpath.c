@@ -117,7 +117,10 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
 
         //copy to dirname
         strcpy(baseName,pathName);
-        return root;
+
+        // printf("split <%s> to base <%s> and DIR <%s>\n",pathNameCopy,baseName,dirName);
+
+        return cwd;
     }else{
 
         if(firstSlash && slashCount == 1){ //ex: "/a"
@@ -152,15 +155,9 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
     char dirnameCopy[128];
     strcpy(dirnameCopy,dirName);
 
-    struct NODE * traversalPtr = root;
+    struct NODE * traversalPtr = (firstSlash)? root: cwd;
 
     char* splitter = "/";
-
-    
-
-    // if(dirnameCopy[0] == '/'){
-    //     printf("dirnameCopy: %s\n",dirnameCopy);
-    // }
 
     // printf("begin traverse\n");
 
