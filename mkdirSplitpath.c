@@ -46,7 +46,6 @@ void mkdir(char pathName[]){
         //if splitPath returns NULL
         return;
     }
-    struct NODE* firstChild = base->childPtr;
 
     //check for no name
     if(baseName[0] == '\0'){
@@ -60,15 +59,29 @@ void mkdir(char pathName[]){
         return;
     }
 
+    //construct node
     struct NODE* newNode = (struct NODE*)malloc(sizeof(struct NODE));
-
     strcpy(newNode->name,baseName);
     newNode->fileType = 'D';
     newNode->childPtr = NULL;
-    newNode->siblingPtr = firstChild;
+    newNode->siblingPtr = NULL;
     newNode->parentPtr = base;
 
-    base->childPtr = newNode;
+    //find last child, or set as first child if no others.
+
+    if(base->childPtr == NULL){
+        base->childPtr = newNode;
+    }else{
+        struct NODE*toAttach = base->childPtr;
+        while(toAttach->siblingPtr != NULL){
+            toAttach = toAttach->siblingPtr;
+        }
+
+        toAttach->siblingPtr = newNode;
+    }
+
+    
+
 
     printf("MKDIR SUCCESS: node %s successfully created\n", pathNameCopy);
 
