@@ -11,6 +11,11 @@ struct NODE* getChild(struct NODE* directory, char* name){
 
     // printf("Directory name: %s, searching name: %s\n", directory->name,name);
 
+    if(iterator == NULL){
+        // printf("getChild iterator is NULL\n");
+        return NULL;
+    }
+
     while(iterator != NULL ){
         // printf("strcmp Iterator name: <%s> name: <%s>\n", iterator->name,name);
 
@@ -36,6 +41,11 @@ void mkdir(char pathName[]){
     strcpy(pathNameCopy,pathName);
 
     struct NODE* base = splitPath(pathName,baseName,dirName);
+
+    if(base == NULL){
+        //if splitPath returns NULL
+        return;
+    }
     struct NODE* firstChild = base->childPtr;
 
     //check for no name
@@ -60,7 +70,7 @@ void mkdir(char pathName[]){
 
     base->childPtr = newNode;
 
-    printf("MKDIR SUCCESS: node %s created\n", pathNameCopy);
+    printf("MKDIR SUCCESS: node %s successfully created\n", pathNameCopy);
 
     return;
 }
@@ -148,28 +158,26 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
 
     
 
-    if(dirnameCopy[0] == '/'){
-        printf("dirnameCopy: %s\n",dirnameCopy);
-    }
+    // if(dirnameCopy[0] == '/'){
+    //     printf("dirnameCopy: %s\n",dirnameCopy);
+    // }
+
+    // printf("begin traverse\n");
 
     char* dir = strtok(dirnameCopy, splitter);
 
     while (dir != NULL) {
         traversalPtr = getChild(traversalPtr, dir);
         if(traversalPtr == NULL){
-            return NULL;
             printf("ERROR: directory %s does not exist\n", dir);
-        
-        
+            return NULL;
         }
         // printf(" %s\n", dir);
         dir = strtok(NULL, splitter); // Subsequent calls use NULL
     }
     
+    // printf("end traverse\n");
     
-
-    
-
     //
     return traversalPtr;
 }
